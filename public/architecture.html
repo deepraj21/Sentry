@@ -9,7 +9,7 @@
   <body>
     <header class="top-nav container">
       <div class="brand">
-        <a href="/">
+        <a class="brand-link" href="/">
           <h1 class="brand">Sentry</h1>
         </a>
       </div>
@@ -31,6 +31,23 @@
 
       <section class="card card-dark">
         <h2 class="title-lg on-dark">End-to-end flow</h2>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+flowchart LR
+  user[User_PR_URL] --> ui[HTML_UI]
+  ui --> api[Express_API_/api/analyze]
+  api --> gh[GitHub_REST_API]
+  gh --> chunk[Diff_Chunker]
+  chunk --> prompt[Prompt_Builder]
+  prompt --> llm[OpenRouter_LLM]
+  llm --> parse[Report_Formatter_JSON_Parse_Retry]
+  parse --> api
+  api --> ui
+  api --> db[(MongoDB_Reports)]
+  ui --> reportsApi[Express_API_/api/reports]
+  reportsApi --> db
+          </div>
+        </div>
         <ol class="flow-list on-dark-soft">
           <li><strong>User submits PR URL</strong> via the home page form.</li>
           <li>
@@ -87,6 +104,11 @@
         </article>
       </section>
     </main>
+
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+    </script>
   </body>
 </html>
 

@@ -42,6 +42,8 @@ app.use((req, res) => {
   return res.sendFile(path.join(publicDir, "index.html"));
 });
 
+export { app };
+
 export default function handler(req, res) {
   return app(req, res);
 }

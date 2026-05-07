@@ -1,4 +1,4 @@
-import app from "./api/index.js";
+import { app } from "./api/index.js";
 
 const port = Number.parseInt(process.env.PORT || "4020", 10);
 

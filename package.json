@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "start": "node api/index.js",
-    "check": "node --check api/index.js"
+    "start": "node server.js",
+    "check": "node --check server.js"
   },
   "engines": {
     "node": ">=18"

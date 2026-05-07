@@ -1,0 +1,26 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: sentry-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  app:
+    build: .
+    container_name: sentry-app
+    ports:
+      - "4020:4020"
+    environment:
+      PORT: "4020"
+      OPENROUTER_API_KEY: "${OPENROUTER_API_KEY}"
+      GITHUB_TOKEN: "${GITHUB_TOKEN}"
+      DEFAULT_MODEL: "${DEFAULT_MODEL}"
+      MONGODB_URI: "mongodb://mongo:27017/sentry"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo_data:
+

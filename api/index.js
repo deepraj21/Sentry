@@ -31,6 +31,10 @@ app.get("/report", (_req, res) => {
   return res.sendFile(path.join(publicDir, "report.html"));
 });
 
+app.get("/architecture", (_req, res) => {
+  return res.sendFile(path.join(publicDir, "architecture.html"));
+});
+
 app.use((req, res) => {
   if (req.path.startsWith("/api/")) {
     return res.status(404).json(errorEnvelope("NOT_FOUND", "API route not found."));

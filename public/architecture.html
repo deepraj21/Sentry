@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentry Architecture</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <a href="/">
+          <h1 class="brand">Sentry</h1>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Home</a>
+        <a class="nav-link nav-link-active" href="/architecture">Architecture</a>
+      </nav>
+    </header>
+
+    <main class="container section-stack">
+      <section class="card">
+        <p class="badge">SYSTEM OVERVIEW</p>
+        <h1 class="display-md">How Sentry reviews a pull request</h1>
+        <p class="body-md">
+          Sentry turns a GitHub PR URL into a structured merge-readiness report by fetching the full PR context,
+          building a deterministic prompt, and asking an LLM to respond with strict JSON.
+        </p>
+      </section>
+
+      <section class="card card-dark">
+        <h2 class="title-lg on-dark">End-to-end flow</h2>
+        <ol class="flow-list on-dark-soft">
+          <li><strong>User submits PR URL</strong> via the home page form.</li>
+          <li>
+            <strong>Express API receives</strong> the request at <code class="inline-code">POST /api/analyze</code>.
+          </li>
+          <li>
+            <strong>GitHub REST fetch</strong> loads PR metadata, changed files (patches), commits, inline review comments,
+            conversation comments, and review states.
+          </li>
+          <li>
+            <strong>Diff chunker</strong> keeps context within limits:
+            prioritizes non-test files, truncates huge patches, and summarizes test files when needed.
+          </li>
+          <li>
+            <strong>Prompt builder</strong> constructs a labeled prompt (metadata → commits → file changes → reviews/comments)
+            plus an explicit JSON schema the model must follow.
+          </li>
+          <li>
+            <strong>OpenRouter LLM call</strong> runs with a 60s timeout and retry-on-5xx.
+          </li>
+          <li>
+            <strong>Report formatter</strong> parses JSON. If parsing fails, Sentry retries once with a stricter “JSON only” reminder.
+          </li>
+          <li>
+            <strong>Response returned</strong> as a consistent envelope:
+            <code class="inline-code">success: true</code> with <code class="inline-code">report</code> and <code class="inline-code">metadata</code>.
+          </li>
+          <li>
+            <strong>(Optional) MongoDB persistence</strong> stores successful reports and the home page shows “Recent Reports” cards via
+            <code class="inline-code">GET /api/reports</code>.
+          </li>
+        </ol>
+      </section>
+
+      <section class="grid-two">
+        <article class="card">
+          <h3 class="title-md">API endpoints</h3>
+          <ul class="bullet-list">
+            <li><code class="inline-code">POST /api/analyze</code> — analyze a PR URL</li>
+            <li><code class="inline-code">GET /api/health</code> — health check</li>
+            <li><code class="inline-code">GET /api/reports</code> — recent saved reports (MongoDB)</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3 class="title-md">Core modules</h3>
+          <ul class="bullet-list">
+            <li><code class="inline-code">lib/github.js</code> — GitHub fetch + pagination + rate-limit errors</li>
+            <li><code class="inline-code">lib/chunker.js</code> — diff sizing/truncation strategy</li>
+            <li><code class="inline-code">lib/prompt-builder.js</code> — deterministic prompt + strict schema</li>
+            <li><code class="inline-code">lib/openrouter.js</code> — LLM call + timeout/retry</li>
+            <li><code class="inline-code">lib/report-formatter.js</code> — parse + retry + envelope</li>
+            <li><code class="inline-code">lib/report-store.js</code> — MongoDB persistence</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+  </body>
+</html>
+

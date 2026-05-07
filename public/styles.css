@@ -67,8 +67,46 @@ body {
   font-weight: 600;
 }
 
+.brand-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-link:hover,
+.brand-link:active,
+.brand-link:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand-text {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
 .brand-mark {
   color: var(--color-primary);
+}
+
+.nav-links {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.nav-link {
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--color-muted);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+}
+
+.nav-link-active {
+  background: var(--color-surface-card);
+  color: var(--color-ink);
 }
 
 .hero-band {
@@ -386,6 +424,28 @@ body {
   padding-left: 20px;
   display: grid;
   gap: var(--spacing-xs);
+}
+
+.inline-code {
+  font-family: var(--font-code);
+  font-size: 13px;
+  background: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.card-dark .inline-code {
+  background: #1f1e1b;
+  border-color: var(--color-surface-dark-elevated);
+  color: var(--color-on-dark);
+}
+
+.flow-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: var(--spacing-sm);
 }
 
 @media (max-width: 1024px) {

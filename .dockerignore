@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log*
+*.log
+.git
+.gitignore
+.DS_Store
+.cursor
+.vscode
+.vercel
+.env
+

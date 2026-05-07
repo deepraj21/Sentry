@@ -1,0 +1,18 @@
+{
+  "name": "sentry-pr-reviewer",
+  "version": "1.0.0",
+  "description": "AI-powered GitHub PR reviewer using GitHub API and OpenRouter",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node api/index.js",
+    "check": "node --check api/index.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "mongodb": "^6.7.0"
+  }
+}

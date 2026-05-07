@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentry Report</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <h1 class="brand">Sentry</h1>
+      </div>
+      <a class="button button-secondary" href="/">Analyze Another PR</a>
+    </header>
+
+    <main class="container section-stack">
+      <section class="card">
+        <p class="badge">MERGE READINESS</p>
+        <h1 id="report-title" class="display-md">No report loaded</h1>
+        <p id="report-summary" class="body-md"></p>
+        <div class="meta-grid">
+          <div><strong>Verdict:</strong> <span id="verdict">-</span></div>
+          <div><strong>Confidence:</strong> <span id="confidence">-</span></div>
+          <div><strong>Model:</strong> <span id="model">-</span></div>
+          <div><strong>Analyzed At:</strong> <span id="analyzed-at">-</span></div>
+        </div>
+      </section>
+
+      <section class="card card-dark">
+        <h2 class="title-lg on-dark">Risk Findings</h2>
+        <div id="risks" class="list-stack on-dark-soft"></div>
+      </section>
+
+      <section class="grid-two">
+        <article class="card"><h3 class="title-md">Strengths</h3><ul id="strengths" class="bullet-list"></ul></article>
+        <article class="card"><h3 class="title-md">Missing Tests</h3><ul id="missing-tests" class="bullet-list"></ul></article>
+        <article class="card"><h3 class="title-md">Security Concerns</h3><ul id="security" class="bullet-list"></ul></article>
+        <article class="card"><h3 class="title-md">Performance Notes</h3><ul id="performance" class="bullet-list"></ul></article>
+      </section>
+
+      <section class="card">
+        <h2 class="title-lg">Merge Readiness</h2>
+        <p><strong>Ready:</strong> <span id="merge-ready">-</span></p>
+        <h3 class="title-sm">Blockers</h3>
+        <ul id="blockers" class="bullet-list"></ul>
+        <h3 class="title-sm">Suggestions</h3>
+        <ul id="suggestions" class="bullet-list"></ul>
+      </section>
+    </main>
+
+    <script type="module" src="/report.js"></script>
+  </body>
+</html>

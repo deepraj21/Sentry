@@ -1,0 +1,29 @@
+.DS_Store
+
+# dependencies
+node_modules/
+
+# env / secrets
+.env
+.env.*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Vercel
+.vercel/
+
+# build outputs (if added later)
+dist/
+build/
+out/
+.next/
+
+# IDE / tooling
+.cursor/
+.vscode/
+

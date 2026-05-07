@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentry PR Reviewer</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <h1 class="brand">Sentry</h1>
+      </div>
+      <a class="button button-primary" href="/report">View Last Report</a>
+    </header>
+
+    <main class="container">
+      <section class="hero-band">
+        <div class="hero-text">
+          <p class="badge badge-coral">AI CODE REVIEW</p>
+          <h1 class="display-xl">Review GitHub PRs with merge confidence</h1>
+          <p class="body-md">
+            Paste a public PR URL and Sentry generates a structured merge/no-merge report using GitHub context and OpenRouter.
+          </p>
+        </div>
+        <div class="card card-dark">
+          <h2 class="title-md on-dark">Analyze Pull Request</h2>
+          <form id="analyze-form" class="form-stack">
+            <label class="form-label" for="prUrl">Pull Request URL</label>
+            <input class="text-input" id="prUrl" name="prUrl" type="url" required placeholder="https://github.com/owner/repo/pull/123" />
+
+            <button id="submit-button" type="submit" class="button button-primary">
+              <span class="button-label" data-default-label>Analyze PR</span>
+              <span class="button-label" data-loading-label hidden>Analyzing</span>
+              <span class="spinner" aria-hidden="true" hidden></span>
+            </button>
+            <p id="status" class="status-text"></p>
+          </form>
+        </div>
+      </section>
+
+      <section class="recent-section">
+        <div class="recent-header">
+          <h2 class="display-md">Recent Reports</h2>
+          <p class="body-md">Previously analyzed pull requests, saved from your workspace.</p>
+        </div>
+        <div id="recent-reports" class="recent-grid"></div>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

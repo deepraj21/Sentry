@@ -3,6 +3,10 @@
 Sentry is an API + lightweight HTML UI that reviews public (and optionally private) GitHub Pull Requests.
 You paste a PR URL, Sentry fetches the PR context from GitHub (metadata, files/diffs, commits, comments, reviews), sends it to an LLM via OpenRouter, and returns a **structured JSON merge-readiness report**. Reports can also be persisted in MongoDB and shown as **recent report cards** on the home page.
 
+## UI Preview
+
+![Sentry UI](https://qmplv4qr76dicsvw.public.blob.vercel-storage.com/sentry.png)
+
 ## What you get
 
 - **UI**: `http://localhost:4020/` (submit PR URL + view recent reports)

@@ -79,7 +79,14 @@ async function loadRecentReports() {
           <h3 class="title-sm recent-title">${escapeHtml(title)}</h3>
           <p class="recent-meta">by @${escapeHtml(author)}</p>
           <p class="recent-summary">${escapeHtml(summary)}</p>
-          <a class="button button-secondary recent-link" href="${escapeHtml(entry.prUrl)}" target="_blank" rel="noopener noreferrer">Open PR</a>
+          <div class="recent-actions">
+            ${
+              entry.id
+                ? `<a class="button button-secondary recent-link" href="/report?id=${escapeHtml(entry.id)}">View Report</a>`
+                : ""
+            }
+            <a class="button button-secondary recent-link" href="${escapeHtml(entry.prUrl)}" target="_blank" rel="noopener noreferrer">Open PR</a>
+          </div>
         </article>`;
       })
       .join("");

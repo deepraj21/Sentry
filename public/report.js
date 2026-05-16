@@ -46,23 +46,7 @@ function renderRisks(report) {
   }
 }
 
-function render() {
-  const raw = localStorage.getItem("sentry:lastReport");
-  if (!raw) {
-    byId("report-title").textContent = "No report loaded";
-    byId("report-summary").textContent =
-      "Run an analysis first from the home page.";
-    return;
-  }
-
-  let data;
-  try {
-    data = JSON.parse(raw);
-  } catch {
-    byId("report-title").textContent = "Unable to parse saved report";
-    return;
-  }
-
+function renderReportData(data) {
   const report = data.report || {};
   const metadata = data.metadata || {};
   const pr = data.pr || {};
@@ -84,6 +68,52 @@ function render() {
   setList(byId("performance"), report.performanceNotes);
   setList(byId("blockers"), report?.mergeReadiness?.blockers);
   setList(byId("suggestions"), report?.mergeReadiness?.suggestions);
+}
+
+function showEmptyState(message) {
+  byId("report-title").textContent = "No report loaded";
+  byId("report-summary").textContent = message;
+}
+
+async function loadReportFromApi(id) {
+  const response = await fetch(`/api/reports/${encodeURIComponent(id)}`);
+  const data = await response.json();
+  if (!response.ok || !data.success) {
+    throw new Error(data?.error?.message || "Failed to load report.");
+  }
+  return data;
+}
+
+async function render() {
+  const params = new URLSearchParams(window.location.search);
+  const reportId = params.get("id");
+
+  if (reportId) {
+    try {
+      const data = await loadReportFromApi(reportId);
+      renderReportData(data);
+      return;
+    } catch (err) {
+      showEmptyState(err?.message || "Could not load this report.");
+      return;
+    }
+  }
+
+  const raw = localStorage.getItem("sentry:lastReport");
+  if (!raw) {
+    showEmptyState("Run an analysis first from the home page.");
+    return;
+  }
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    byId("report-title").textContent = "Unable to parse saved report";
+    return;
+  }
+
+  renderReportData(data);
 }
 
 render();

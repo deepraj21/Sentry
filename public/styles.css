@@ -168,6 +168,13 @@ body {
   color: var(--color-body);
 }
 
+.recent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-xs);
+}
+
 .recent-link {
   width: fit-content;
 }

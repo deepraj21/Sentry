@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects · Sentry</title>
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="Manage connected GitHub repositories, search projects, and trigger AI reviews on open pull requests." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <a class="brand-link" href="/">
+          <h1 class="brand">Sentry</h1>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Home</a>
+        <span id="nav-auth" class="nav-auth"></span>
+      </nav>
+    </header>
+
+    <main class="container section-stack main-section">
+      <div class="hero-text">
+        <p class="badge badge-coral">WORKSPACE</p>
+        <h1 class="display-xl">Projects</h1>
+        <p class="body-md">
+          Connect GitHub repositories to review open pull requests privately.
+        </p>
+      </div>
+
+      <div class="projects-toolbar">
+        <input
+          class="text-input auth-input projects-search-input"
+          id="project-search"
+          type="search"
+          placeholder="Search by owner or repo name..."
+        />
+        <button type="button" id="open-add-project" class="button button-primary">+ Add Project</button>
+      </div>
+
+      <div id="projects-grid" class="projects-grid"></div>
+    </main>
+
+    <div id="add-project-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close-modal></div>
+      <div class="modal-panel card" role="dialog" aria-labelledby="add-project-title">
+        <div class="modal-header">
+          <h2 id="add-project-title" class="title-md">Add GitHub Project</h2>
+          <button type="button" class="modal-close" data-close-modal aria-label="Close">&times;</button>
+        </div>
+
+        <form id="add-project-form" class="form-stack">
+          <label class="form-label auth-label" for="repo-url">Repository URL</label>
+          <input
+            class="text-input auth-input"
+            id="repo-url"
+            name="repoUrl"
+            type="url"
+            required
+            placeholder="https://github.com/owner/repo"
+          />
+
+          <div id="token-section" class="token-section" hidden>
+            <label class="form-label auth-label" for="github-token">GitHub Personal Access Token</label>
+            <input
+              class="text-input auth-input"
+              id="github-token"
+              name="githubToken"
+              type="password"
+              autocomplete="off"
+              placeholder="ghp_..."
+            />
+
+            <details class="token-help">
+              <summary>How to create a GitHub token</summary>
+              <ol class="help-list">
+                <li>Open GitHub → <strong>Settings</strong> → <strong>Developer settings</strong> → <strong>Personal access tokens</strong>.</li>
+                <li>Create a <strong>classic</strong> token (or fine-grained token scoped to this repo).</li>
+                <li>For private repos: enable the <code class="inline-code">repo</code> scope.</li>
+                <li>For public repos with comments: enable <code class="inline-code">public_repo</code> or pull request write access.</li>
+                <li>Copy the token and paste it here. Sentry encrypts it before storing.</li>
+              </ol>
+            </details>
+          </div>
+
+          <div id="verify-result" class="verify-result" hidden></div>
+
+          <div class="modal-actions">
+            <button type="button" id="verify-repo-btn" class="button button-secondary">Verify</button>
+            <button type="submit" id="add-repo-btn" class="button button-primary" disabled>Add Project</button>
+          </div>
+
+          <p id="add-project-status" class="status-text auth-status"></p>
+        </form>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
+
+    <script type="module" src="/projects.js"></script>
+  </body>
+</html>

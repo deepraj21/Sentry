@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sentry Architecture</title>
+    <title>Architecture · Sentry</title>
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="How Sentry connects to GitHub, analyzes pull requests with AI, and stores review reports." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -15,100 +17,193 @@
       </div>
       <nav class="nav-links">
         <a class="nav-link" href="/">Home</a>
-        <a class="nav-link nav-link-active" href="/architecture">Architecture</a>
+        <span id="nav-auth" class="nav-auth"></span>
       </nav>
     </header>
 
-    <main class="container section-stack">
+    <main class="container section-stack main-section">
       <section class="card">
         <p class="badge">SYSTEM OVERVIEW</p>
-        <h1 class="display-md">How Sentry reviews a pull request</h1>
+        <h1 class="display-md">How Sentry works</h1>
         <p class="body-md">
-          Sentry turns a GitHub PR URL into a structured merge-readiness report by fetching the full PR context,
-          building a deterministic prompt, and asking an LLM to respond with strict JSON.
+          Sentry is an AI pull request reviewer. Users sign in, connect GitHub repositories as projects,
+          trigger reviews on open PRs, and optionally post structured merge-readiness comments back to GitHub
+          through a GitHub App bot identity.
         </p>
       </section>
 
       <section class="card card-dark">
-        <h2 class="title-lg on-dark">End-to-end flow</h2>
+        <h2 class="title-lg on-dark">End-to-end review flow</h2>
         <div class="mermaid-wrap">
           <div class="mermaid">
-flowchart LR
-  user[User_PR_URL] --> ui[HTML_UI]
-  ui --> api[Express_API_/api/analyze]
-  api --> gh[GitHub_REST_API]
-  gh --> chunk[Diff_Chunker]
-  chunk --> prompt[Prompt_Builder]
-  prompt --> llm[OpenRouter_LLM]
-  llm --> parse[Report_Formatter_JSON_Parse_Retry]
-  parse --> api
-  api --> ui
-  api --> db[(MongoDB_Reports)]
-  ui --> reportsApi[Express_API_/api/reports]
-  reportsApi --> db
+flowchart TB
+  subgraph ui [Browser]
+    authPage["/auth Sign in"]
+    projectsPage["/projects Hub"]
+    projectPage["/project Open PRs"]
+    reportPage["/report Report"]
+  end
+
+  subgraph api [Express API]
+    authApi["/api/auth"]
+    projectsApi["/api/projects"]
+    reportsApi["/api/reports"]
+  end
+
+  subgraph pipeline [Analyze pipeline]
+    ghFetch[GitHub PR fetch]
+    chunk[Diff chunker]
+    prompt[Prompt builder]
+    llm[OpenRouter LLM]
+    parse[JSON parse + retry]
+  end
+
+  authPage --> authApi
+  projectsPage --> projectsApi
+  projectPage --> projectsApi
+  reportPage --> reportsApi
+
+  projectsApi -->|"POST /:id/analyze"| ghFetch
+  ghFetch --> chunk --> prompt --> llm --> parse
+  parse --> mongo[(MongoDB Reports)]
+  parse --> reportPage
           </div>
         </div>
         <ol class="flow-list on-dark-soft">
-          <li><strong>User submits PR URL</strong> via the home page form.</li>
+          <li><strong>Sign in</strong> — JWT session via <code class="inline-code">POST /api/auth/login</code>.</li>
+          <li><strong>Add a project</strong> — verify repo access, optionally store an encrypted PAT for private repos.</li>
+          <li><strong>List open PRs</strong> — <code class="inline-code">GET /api/projects/:id/pulls</code>.</li>
+          <li><strong>Trigger review</strong> — <code class="inline-code">POST /api/projects/:id/analyze</code> with a pull number.</li>
+          <li><strong>GitHub fetch</strong> — metadata, diffs, commits, reviews, and comments.</li>
+          <li><strong>Diff chunker</strong> — prioritizes non-test files and truncates huge patches.</li>
+          <li><strong>LLM call</strong> — OpenRouter with strict JSON schema; one retry on parse failure.</li>
+          <li><strong>Save report</strong> — scoped to <code class="inline-code">userId</code> + <code class="inline-code">projectId</code>; private by default.</li>
+          <li><strong>View report</strong> — full merge-readiness UI at <code class="inline-code">/report?id=…</code>.</li>
+        </ol>
+      </section>
+
+      <section class="card card-dark">
+        <h2 class="title-lg on-dark">GitHub App comment flow</h2>
+        <div class="mermaid-wrap">
+          <div class="mermaid">
+flowchart LR
+  click[Post Comment to PR] --> api["POST /api/reports/:id/comment"]
+  api --> resolve[resolveCommentPostingToken]
+  resolve --> appToken[GitHub App install token]
+  resolve --> botToken[GITHUB_BOT_TOKEN]
+  resolve --> pat[Project PAT fallback]
+  appToken --> post[postPullRequestComment]
+  botToken --> post
+  pat --> post
+  post --> ghComment[GitHub PR comment]
+          </div>
+        </div>
+        <ol class="flow-list on-dark-soft">
           <li>
-            <strong>Express API receives</strong> the request at <code class="inline-code">POST /api/analyze</code>.
+            User installs
+            <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review/installations/new" target="_blank" rel="noopener noreferrer">sentry-pr-review</a>
+            on their GitHub account (one-time per account/org).
           </li>
-          <li>
-            <strong>GitHub REST fetch</strong> loads PR metadata, changed files (patches), commits, inline review comments,
-            conversation comments, and review states.
-          </li>
-          <li>
-            <strong>Diff chunker</strong> keeps context within limits:
-            prioritizes non-test files, truncates huge patches, and summarizes test files when needed.
-          </li>
-          <li>
-            <strong>Prompt builder</strong> constructs a labeled prompt (metadata → commits → file changes → reviews/comments)
-            plus an explicit JSON schema the model must follow.
-          </li>
-          <li>
-            <strong>OpenRouter LLM call</strong> runs with a 60s timeout and retry-on-5xx.
-          </li>
-          <li>
-            <strong>Report formatter</strong> parses JSON. If parsing fails, Sentry retries once with a stricter “JSON only” reminder.
-          </li>
-          <li>
-            <strong>Response returned</strong> as a consistent envelope:
-            <code class="inline-code">success: true</code> with <code class="inline-code">report</code> and <code class="inline-code">metadata</code>.
-          </li>
-          <li>
-            <strong>(Optional) MongoDB persistence</strong> stores successful reports and the home page shows “Recent Reports” cards via
-            <code class="inline-code">GET /api/reports</code>.
-          </li>
+          <li>Sentry checks install status via <code class="inline-code">GET /api/projects/:id/github-app</code>.</li>
+          <li>On post, the server resolves a token: App installation → bot token → project/env PAT.</li>
+          <li><code class="inline-code">comment-formatter.js</code> builds branded markdown; <code class="inline-code">github.js</code> posts it.</li>
+          <li>Report is marked with <code class="inline-code">githubCommentUrl</code> so it cannot be posted twice.</li>
         </ol>
       </section>
 
       <section class="grid-two">
         <article class="card">
-          <h3 class="title-md">API endpoints</h3>
+          <h3 class="title-md">Pages</h3>
           <ul class="bullet-list">
-            <li><code class="inline-code">POST /api/analyze</code> — analyze a PR URL</li>
-            <li><code class="inline-code">GET /api/health</code> — health check</li>
-            <li><code class="inline-code">GET /api/reports</code> — recent saved reports (MongoDB)</li>
+            <li><code class="inline-code">/</code> — home + public recent reports</li>
+            <li><code class="inline-code">/auth</code> — sign in / register</li>
+            <li><code class="inline-code">/projects</code> — project hub</li>
+            <li><code class="inline-code">/project</code> — open PRs + reviews</li>
+            <li><code class="inline-code">/report</code> — merge-readiness report</li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3 class="title-md">Data model</h3>
+          <ul class="bullet-list">
+            <li><strong>Users</strong> — username + hashed password</li>
+            <li><strong>Projects</strong> — owner/repo, optional encrypted PAT</li>
+            <li><strong>Reports</strong> — PR snapshot, AI report, visibility, project scope</li>
+          </ul>
+        </article>
+      </section>
+
+      <section class="grid-two">
+        <article class="card">
+          <h3 class="title-md">API — Auth</h3>
+          <ul class="bullet-list">
+            <li><code class="inline-code">POST /api/auth/register</code></li>
+            <li><code class="inline-code">POST /api/auth/login</code></li>
+            <li><code class="inline-code">GET /api/auth/me</code></li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3 class="title-md">API — Projects</h3>
+          <ul class="bullet-list">
+            <li><code class="inline-code">GET /api/projects</code> — list / search</li>
+            <li><code class="inline-code">POST /api/projects/verify</code></li>
+            <li><code class="inline-code">POST /api/projects</code> — add repo</li>
+            <li><code class="inline-code">GET /api/projects/:id/pulls</code></li>
+            <li><code class="inline-code">POST /api/projects/:id/analyze</code></li>
+            <li><code class="inline-code">GET /api/projects/:id/github-app</code></li>
+            <li><code class="inline-code">DELETE /api/projects/:id</code></li>
+            <li><code class="inline-code">DELETE /api/projects/:id/reports/:reportId</code></li>
+          </ul>
+        </article>
+        <article class="card">
+          <h3 class="title-md">API — Reports</h3>
+          <ul class="bullet-list">
+            <li><code class="inline-code">GET /api/reports</code> — public feed</li>
+            <li><code class="inline-code">GET /api/reports/:id</code></li>
+            <li><code class="inline-code">POST /api/reports/:id/comment</code></li>
+            <li><code class="inline-code">POST /api/analyze</code> — legacy URL analyze</li>
+            <li><code class="inline-code">GET /api/health</code></li>
           </ul>
         </article>
         <article class="card">
           <h3 class="title-md">Core modules</h3>
           <ul class="bullet-list">
-            <li><code class="inline-code">lib/github.js</code> — GitHub fetch + pagination + rate-limit errors</li>
-            <li><code class="inline-code">lib/chunker.js</code> — diff sizing/truncation strategy</li>
-            <li><code class="inline-code">lib/prompt-builder.js</code> — deterministic prompt + strict schema</li>
-            <li><code class="inline-code">lib/openrouter.js</code> — LLM call + timeout/retry</li>
-            <li><code class="inline-code">lib/report-formatter.js</code> — parse + retry + envelope</li>
-            <li><code class="inline-code">lib/report-store.js</code> — MongoDB persistence</li>
+            <li><code class="inline-code">lib/analyze-pr.js</code> — shared analyze pipeline</li>
+            <li><code class="inline-code">lib/auth.js</code> — JWT middleware</li>
+            <li><code class="inline-code">lib/project-store.js</code> — projects + encrypted tokens</li>
+            <li><code class="inline-code">lib/report-store.js</code> — scoped report CRUD</li>
+            <li><code class="inline-code">lib/github-app.js</code> — App JWT + install status</li>
+            <li><code class="inline-code">lib/comment-poster.js</code> — post bot comments</li>
+            <li><code class="inline-code">lib/github.js</code> — GitHub REST client</li>
+            <li><code class="inline-code">lib/openrouter.js</code> — LLM client</li>
           </ul>
         </article>
       </section>
+
+      <section class="card">
+        <h2 class="title-md">Environment &amp; security</h2>
+        <ul class="bullet-list">
+          <li><code class="inline-code">OPENROUTER_API_KEY</code> — LLM access</li>
+          <li><code class="inline-code">JWT_SECRET</code> — session tokens</li>
+          <li><code class="inline-code">MONGODB_URI</code> — users, projects, reports</li>
+          <li><code class="inline-code">GITHUB_APP_ID</code> + <code class="inline-code">GITHUB_APP_PRIVATE_KEY</code> — bot comments</li>
+          <li><code class="inline-code">ENCRYPTION_KEY</code> — encrypts per-project GitHub PATs</li>
+          <li>Private reports require auth; homepage only shows <code class="inline-code">visibility: public</code> reports.</li>
+        </ul>
+      </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
 
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+      import { initNavAuth } from "/auth-session.js";
       mermaid.initialize({ startOnLoad: true, securityLevel: "strict" });
+      initNavAuth();
     </script>
   </body>
 </html>
-

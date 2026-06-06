@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sign In · Sentry</title>
+    <meta name="description" content="Sign in or create an account to connect GitHub repos and run AI pull request reviews." />
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <a class="brand-link" href="/">
+          <h1 class="brand">Sentry</h1>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Home</a>
+        <span id="nav-auth" class="nav-auth"></span>
+      </nav>
+    </header>
+
+    <main class="container auth-page main-section">
+      <section class="card auth-card">
+        <p class="badge badge-coral">ACCOUNT</p>
+        <h1 class="display-md">Welcome to Sentry</h1>
+        <p class="body-md auth-lead">Sign in or create an account to save and manage your projects.</p>
+
+        <div class="auth-tabs" role="tablist" aria-label="Authentication mode">
+          <button type="button" class="auth-tab auth-tab-active" data-tab="signin" role="tab" aria-selected="true">
+            Sign In
+          </button>
+          <button type="button" class="auth-tab" data-tab="signup" role="tab" aria-selected="false">
+            Sign Up
+          </button>
+        </div>
+
+        <form id="signin-form" class="form-stack auth-form" data-mode="signin">
+          <label class="form-label auth-label" for="signin-username">Username</label>
+          <input
+            class="text-input auth-input"
+            id="signin-username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            required
+            minlength="3"
+            placeholder="yourname"
+          />
+
+          <label class="form-label auth-label" for="signin-password">Password</label>
+          <input
+            class="text-input auth-input"
+            id="signin-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+            minlength="6"
+            placeholder="••••••••"
+          />
+
+          <button type="submit" class="button button-primary auth-submit">Sign In</button>
+        </form>
+
+        <form id="signup-form" class="form-stack auth-form" data-mode="signup" hidden>
+          <label class="form-label auth-label" for="signup-username">Username</label>
+          <input
+            class="text-input auth-input"
+            id="signup-username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            required
+            minlength="3"
+            placeholder="yourname"
+          />
+
+          <label class="form-label auth-label" for="signup-password">Password</label>
+          <input
+            class="text-input auth-input"
+            id="signup-password"
+            name="password"
+            type="password"
+            autocomplete="new-password"
+            required
+            minlength="6"
+            placeholder="••••••••"
+          />
+
+          <button type="submit" class="button button-primary auth-submit">Create Account</button>
+        </form>
+
+        <p id="auth-status" class="status-text auth-status"></p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
+
+    <script type="module" src="/auth.js"></script>
+  </body>
+</html>

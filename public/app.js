@@ -1,3 +1,5 @@
+import { initNavAuth } from "./auth-session.js";
+
 const form = document.getElementById("analyze-form");
 const statusEl = document.getElementById("status");
 const submitButton = document.getElementById("submit-button");
@@ -125,7 +127,11 @@ form?.addEventListener("submit", async (event) => {
     localStorage.setItem("sentry:lastReport", JSON.stringify(data));
     setStatus("Report generated successfully. Redirecting...", "status-success");
     await loadRecentReports();
-    window.location.assign("/report");
+    if (data.reportId) {
+      window.location.assign(`/report?id=${encodeURIComponent(data.reportId)}`);
+    } else {
+      window.location.assign("/report");
+    }
   } catch (err) {
     setStatus(err.message || "Unexpected error while analyzing PR.", "status-error");
   } finally {
@@ -134,3 +140,9 @@ form?.addEventListener("submit", async (event) => {
 });
 
 loadRecentReports();
+initNavAuth();
+
+if (window.location.hash === "#analyze-form") {
+  form?.scrollIntoView({ behavior: "smooth", block: "center" });
+  document.getElementById("prUrl")?.focus();
+}

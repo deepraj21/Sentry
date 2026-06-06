@@ -3,9 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sentry PR Reviewer</title>
+    <title>Sentry — AI GitHub PR Reviewer</title>
+    <meta name="description" content="Review GitHub pull requests with AI-powered merge-readiness reports, risk scores, and actionable feedback." />
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
     <link rel="canonical" href="https://sentry-pr-review.vercel.app/" />
-    <meta name="description" content="Sentry reviews GitHub pull requests with AI and generates structured merge-readiness reports." />
     <meta property="og:site_name" content="Sentry PR Reviewer" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Sentry PR Reviewer" />
@@ -34,11 +35,11 @@
       </div>
       <nav class="nav-links">
         <a class="nav-link nav-link-active" href="/">Home</a>
-        <a class="nav-link" href="/architecture">Architecture</a>
+        <span id="nav-auth" class="nav-auth"></span>
       </nav>
     </header>
 
-    <main class="container">
+    <main class="container main-section">
       <section class="hero-band">
         <div class="hero-text">
           <p class="badge badge-coral">AI CODE REVIEW</p>
@@ -71,6 +72,13 @@
         <div id="recent-reports" class="recent-grid"></div>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
 
     <script type="module" src="/app.js"></script>
   </body>

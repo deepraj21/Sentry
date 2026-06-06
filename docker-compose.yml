@@ -18,6 +18,10 @@ services:
       GITHUB_TOKEN: "${GITHUB_TOKEN}"
       DEFAULT_MODEL: "${DEFAULT_MODEL}"
       MONGODB_URI: "mongodb://mongo:27017/sentry"
+      JWT_SECRET: "${JWT_SECRET}"
+      GITHUB_BOT_TOKEN: "${GITHUB_BOT_TOKEN}"
+      GITHUB_APP_ID: "${GITHUB_APP_ID}"
+      GITHUB_APP_PRIVATE_KEY: "${GITHUB_APP_PRIVATE_KEY}"
     depends_on:
       - mongo
 

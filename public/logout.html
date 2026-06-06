@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Logging out · Sentry</title>
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="Signing you out of Sentry." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container auth-page">
+      <p class="body-md">Logging out...</p>
+    </main>
+    <script type="module">
+      import { logout } from "./auth-session.js";
+      await logout();
+    </script>
+  </body>
+</html>

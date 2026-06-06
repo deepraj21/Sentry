@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project · Sentry</title>
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="View open pull requests for a connected repo and run AI merge-readiness reviews." />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="top-nav container">
+      <div class="brand">
+        <a class="brand-link" href="/">
+          <h1 class="brand">Sentry</h1>
+        </a>
+      </div>
+      <nav class="nav-links">
+        <a class="nav-link" href="/">Home</a>
+        <span id="nav-auth" class="nav-auth"></span>
+      </nav>
+    </header>
+
+    <main class="container section-stack main-section">
+      <section class="projects-header project-detail-header">
+        <div class="project-header-info">
+          <p class="badge badge-coral">PROJECT</p>
+          <h1 id="project-title" class="display-md">Loading...</h1>
+          <p id="project-meta" class="body-md"></p>
+        </div>
+        <div class="project-header-actions">
+          <div class="project-header-actions-left">
+            <a class="button button-secondary" href="/projects">← All Projects</a>
+            <button type="button" id="delete-project" class="button button-danger">Delete Project</button>
+          </div>
+          <div class="project-header-actions-right">
+            <a
+              id="install-github-app-btn"
+              class="button button-primary install-app-btn"
+              href="https://github.com/apps/sentry-pr-review/installations/new"
+              target="_blank"
+              rel="noopener noreferrer"
+              hidden
+            >
+              <span class="install-app-logo" aria-hidden="true"></span>
+              <span>Install Sentry on GitHub</span>
+            </a>
+            <span id="github-app-installed-badge" class="badge badge-comment-posted" hidden>
+              GitHub App connected
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="title-md">Open Pull Requests</h2>
+        <p class="body-md">Trigger a private AI review for any open PR in this repository.</p>
+
+        <div id="pulls-table-wrap" class="pulls-table-wrap">
+          <p class="body-md">Loading pull requests...</p>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="title-md">Recent Reviews</h2>
+        <p class="body-md">Your past analyses for this project (private unless marked public).</p>
+        <div id="project-reports" class="recent-grid"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
+
+    <script type="module" src="/project.js"></script>
+  </body>
+</html>

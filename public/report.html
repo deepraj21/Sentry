@@ -3,7 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sentry Report</title>
+    <title>Review Report · Sentry</title>
+    <link rel="icon" href="/brand-logo.svg" type="image/svg+xml" />
+    <meta name="description" content="Structured AI pull request review with merge confidence, risks, and suggested next steps." />
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -15,11 +17,11 @@
       </div>
       <nav class="nav-links">
         <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/architecture">Architecture</a>
+        <span id="nav-auth" class="nav-auth"></span>
       </nav>
     </header>
 
-    <main class="container section-stack">
+    <main class="container section-stack main-section">
       <section class="card">
         <p class="badge">MERGE READINESS</p>
         <h1 id="report-title" class="display-md">No report loaded</h1>
@@ -29,6 +31,31 @@
           <div><strong>Confidence:</strong> <span id="confidence">-</span></div>
           <div><strong>Model:</strong> <span id="model">-</span></div>
           <div><strong>Analyzed At:</strong> <span id="analyzed-at">-</span></div>
+        </div>
+        <div id="report-actions" class="report-actions" hidden>
+          <div id="github-app-install" class="github-app-install" hidden>
+            <p class="github-app-install-text">
+              To post reviews as the Sentry bot, install the GitHub App on this repository (one-time setup).
+            </p>
+            <a
+              id="install-github-app-btn"
+              class="button button-primary"
+              href="https://github.com/apps/sentry-pr-review/installations/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Install GitHub App
+            </a>
+          </div>
+          <div class="report-actions-main">
+            <div class="report-actions-buttons">
+              <button type="button" id="post-comment-btn" class="button button-primary">Post Comment to PR</button>
+              <a id="github-comment-link" class="button button-secondary" target="_blank" rel="noopener noreferrer" hidden>View on GitHub</a>
+              <button type="button" id="delete-report-btn" class="button button-danger" hidden>Delete Review</button>
+            </div>
+            <span id="comment-status-badge" class="badge badge-comment-posted" hidden>Review comment posted to GitHub.</span>
+          </div>
+          <p id="comment-status" class="comment-status-message"></p>
         </div>
       </section>
 
@@ -44,6 +71,17 @@
         <article class="card"><h3 class="title-md">Performance Notes</h3><ul id="performance" class="bullet-list"></ul></article>
       </section>
 
+      <section class="card" id="comment-preview-section" hidden>
+        <div class="comment-preview-header">
+          <h2 class="title-lg">Comment Preview</h2>
+          <button type="button" id="toggle-comment-preview" class="button button-secondary button-sm">
+            Show preview
+          </button>
+        </div>
+        <p class="body-sm text-muted">Preview of the GitHub comment before posting.</p>
+        <pre id="comment-preview-body" class="comment-preview-body" hidden></pre>
+      </section>
+
       <section class="card">
         <h2 class="title-lg">Merge Readiness</h2>
         <p><strong>Ready:</strong> <span id="merge-ready">-</span></p>
@@ -53,6 +91,13 @@
         <ul id="suggestions" class="bullet-list"></ul>
       </section>
     </main>
+
+    <footer class="site-footer">
+      <div class="container site-footer-inner">
+        <p class="site-footer-text">Sentry · <a class="site-footer-link" href="/architecture">Architecture</a></p>
+        <a class="site-footer-link" href="https://github.com/apps/sentry-pr-review" target="_blank" rel="noopener noreferrer">GitHub App</a>
+      </div>
+    </footer>
 
     <script type="module" src="/report.js"></script>
   </body>

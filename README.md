@@ -54,10 +54,10 @@ flowchart TB
   end
 
   subgraph api [Express API]
-    authApi[/api/auth]
-    projectsApi[/api/projects]
-    reportsApi[/api/reports]
-    analyzeApi[/api/analyze]
+    authApi["api/auth"]
+    projectsApi["api/projects"]
+    reportsApi["api/reports"]
+    analyzeApi["api/analyze"]
   end
 
   subgraph core [Core libs]
@@ -96,11 +96,11 @@ flowchart TB
 
 ```mermaid
 flowchart LR
-  user[User clicks Post Comment] --> api[POST /api/reports/:id/comment]
+  user[User clicks Post Comment] --> api["POST reports comment"]
   api --> token[resolveCommentPostingToken]
   token --> app[GitHub App installation token]
   token --> bot[GITHUB_BOT_TOKEN fallback]
-  token --> pat[Project PAT / GITHUB_TOKEN fallback]
+  token --> pat[Project PAT fallback]
   app --> post[postPullRequestComment]
   bot --> post
   pat --> post
